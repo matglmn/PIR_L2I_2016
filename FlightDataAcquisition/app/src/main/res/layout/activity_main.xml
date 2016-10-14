@@ -4,7 +4,8 @@
     android:orientation="vertical"
     android:gravity="center"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/logo">
 
     <TextView
         android:layout_width="match_parent"
@@ -12,11 +13,13 @@
         android:textSize="50sp"
         android:textAlignment="center"
         android:text="@string/welcome_text" />
+
     <Button
         android:layout_marginTop="80dp"
         android:textSize="70sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_get_started"
-        android:onClick="sendStarted"/>
+        android:onClick="sendStarted" />
+
 </LinearLayout>

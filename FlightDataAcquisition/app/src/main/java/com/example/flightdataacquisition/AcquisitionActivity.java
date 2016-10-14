@@ -18,11 +18,20 @@ public class AcquisitionActivity extends AppCompatActivity {
 
         Pbar = (ProgressBar)findViewById(R.id.progress);
         Pbar.setVisibility(View.INVISIBLE);
+
         Button button_start = (Button)findViewById(R.id.startButton);
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.VISIBLE);
+            }
+        });
+
+        Button button_stop = (Button)findViewById(R.id.stopButton);
+        button_stop.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Pbar.setVisibility(View.INVISIBLE);
             }
         });
     }
