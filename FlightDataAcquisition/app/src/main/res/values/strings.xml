@@ -6,4 +6,5 @@
     <string name="start_button">Start</string>
     <string name="stop_button">Stop</string>
     <string name="marker">Set \n Marker</string>
+    <string name="acquisition_text">Acquisition Panel</string>
 </resources>
