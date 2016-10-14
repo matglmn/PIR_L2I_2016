@@ -3,4 +3,7 @@
     <string name="button_get_started">Get started !</string>
     <string name="welcome_text">Welcome on FlightData Acquisition ! With this app you can save
         multiple flight data whenever you wish during your flight !</string>
+    <string name="start_button">Start</string>
+    <string name="stop_button">Stop</string>
+    <string name="marker">Set \n Marker</string>
 </resources>
