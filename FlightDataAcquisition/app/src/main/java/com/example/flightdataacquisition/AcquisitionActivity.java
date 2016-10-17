@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 public class AcquisitionActivity extends AppCompatActivity {
 
     ProgressBar Pbar;
+    TextView AcqText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +21,15 @@ public class AcquisitionActivity extends AppCompatActivity {
         Pbar = (ProgressBar)findViewById(R.id.progress);
         Pbar.setVisibility(View.INVISIBLE);
 
+        AcqText = (TextView)findViewById(R.id.acqText);
+        AcqText.setVisibility(View.INVISIBLE);
+
         Button button_start = (Button)findViewById(R.id.startButton);
         button_start.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.VISIBLE);
+                AcqText.setVisibility(View.VISIBLE);
             }
         });
 
@@ -32,6 +38,7 @@ public class AcquisitionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.INVISIBLE);
+                AcqText.setVisibility(View.INVISIBLE);
             }
         });
     }

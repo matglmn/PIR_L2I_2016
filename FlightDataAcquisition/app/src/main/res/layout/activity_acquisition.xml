@@ -51,14 +51,31 @@
 
         </LinearLayout>
 
-        <ProgressBar
-            android:layout_marginStart="50dp"
-            android:layout_marginLeft="50dp"
-            android:id="@+id/progress"
-            android:layout_weight="4"
-            android:layout_width="0dp"
-            android:layout_height="400dp"
-            android:indeterminate="true" />
+        <LinearLayout
+            android:id="@+id/acquiringLayout"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <ProgressBar
+                android:layout_marginStart="50dp"
+                android:layout_marginLeft="50dp"
+                android:id="@+id/progress"
+                android:layout_width="400dp"
+                android:layout_height="400dp"
+                android:indeterminate="true"
+                android:layout_marginBottom="0dp"/>
+
+            <TextView
+                android:id="@+id/acqText"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/acquiring"
+                android:textSize="50sp" />
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/markerButton"
@@ -70,5 +87,7 @@
             android:background="@color/colorMark"/>
 
     </LinearLayout>
+
+
 
 </LinearLayout>
