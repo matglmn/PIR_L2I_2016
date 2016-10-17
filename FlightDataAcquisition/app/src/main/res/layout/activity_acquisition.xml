@@ -80,14 +80,12 @@
         <Button
             android:id="@+id/markerButton"
             android:layout_weight="0.5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/marker"
             android:textSize="60sp"
             android:background="@color/colorMark"/>
 
     </LinearLayout>
-
-
 
 </LinearLayout>
