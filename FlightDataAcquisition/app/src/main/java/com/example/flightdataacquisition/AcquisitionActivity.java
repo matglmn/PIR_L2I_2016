@@ -1,8 +1,12 @@
 package com.example.flightdataacquisition;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,11 +14,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 
 
 public class AcquisitionActivity extends AppCompatActivity implements LocationListener {
@@ -49,6 +48,7 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
 
     public Location getLocation() {
         try {
+
             locationManager = (LocationManager) mContext
                     .getSystemService(LOCATION_SERVICE);
 
@@ -80,7 +80,7 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
                 }
             }
 
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             e.printStackTrace();
         }
 
