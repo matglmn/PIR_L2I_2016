@@ -12,9 +12,12 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.location.LocationServices;
+
 
 public class AcquisitionActivity extends AppCompatActivity implements LocationListener {
 
+    // Defines variables
     ProgressBar Pbar;
     TextView AcqText;
 
