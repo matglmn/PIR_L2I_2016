@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.location.LocationServices;
-
 
 public class AcquisitionActivity extends AppCompatActivity implements LocationListener {
 
@@ -41,6 +39,7 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
     // Declaring a Location Manager
     protected LocationManager locationManager;
 
+
     public AcquisitionActivity(Context context) {
         this.mContext = context;
         getLocation();
@@ -61,25 +60,22 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
             } else {
                 this.canGetLocation = true;
                 // if GPS Enabled get lat/long using GPS Services
-                if (isGPSEnabled) {
-                    if (location == null) {
-                        locationManager.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-                        Log.d("GPS Enabled", "GPS Enabled");
-                        if (locationManager != null) {
-                            location = locationManager
-                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                            }
+                if (location == null) {
+                    locationManager.requestLocationUpdates(
+                            LocationManager.GPS_PROVIDER,
+                            MIN_TIME_BW_UPDATES,
+                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    Log.d("GPS Enabled", "GPS Enabled");
+                    if (locationManager != null) {
+                        location = locationManager
+                                .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
                         }
                     }
                 }
             }
-
         } catch (SecurityException e) {
             e.printStackTrace();
         }
@@ -106,7 +102,19 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
     }
 
     @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
     public void onLocationChanged(Location location) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
     public void stopUsingGPS(){
