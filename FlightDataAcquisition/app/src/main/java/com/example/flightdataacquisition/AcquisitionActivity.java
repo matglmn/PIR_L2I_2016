@@ -1,12 +1,9 @@
 package com.example.flightdataacquisition;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,7 +108,11 @@ public class AcquisitionActivity extends AppCompatActivity implements LocationLi
 
     public void stopUsingGPS(){
         if(locationManager != null){
-            locationManager.removeUpdates(AcquisitionActivity.this);
+            try {
+                locationManager.removeUpdates(AcquisitionActivity.this);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
         }
     }
 
