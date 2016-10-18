@@ -1,56 +1,118 @@
 package com.example.flightdataacquisition;
 
 import android.content.Context;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 
-public class AcquisitionActivity extends AppCompatActivity implements SensorEventListener {
-    private SensorManager mSensorManager;
-    private Sensor mSensor;
+
+public class AcquisitionActivity extends AppCompatActivity implements LocationListener {
 
     ProgressBar Pbar;
     TextView AcqText;
 
-    protected void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    private final Context mContext;
+
+    // flag for GPS status
+    boolean isGPSEnabled = false;
+
+    boolean canGetLocation = false;
+
+    Location location; // location
+    double latitude; // latitude
+    double longitude; // longitude
+
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 500; // 1 minute
+
+    // Declaring a Location Manager
+    protected LocationManager locationManager;
+
+    public AcquisitionActivity(Context context) {
+        this.mContext = context;
+        getLocation();
     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
+    public Location getLocation() {
+        try {
+            locationManager = (LocationManager) mContext
+                    .getSystemService(LOCATION_SERVICE);
+
+            // getting GPS status
+            isGPSEnabled = locationManager
+                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+            if (!isGPSEnabled) {
+                // No GPS Enabled...
+            } else {
+                this.canGetLocation = true;
+                // if GPS Enabled get lat/long using GPS Services
+                if (isGPSEnabled) {
+                    if (location == null) {
+                        locationManager.requestLocationUpdates(
+                                LocationManager.GPS_PROVIDER,
+                                MIN_TIME_BW_UPDATES,
+                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                        Log.d("GPS Enabled", "GPS Enabled");
+                        if (locationManager != null) {
+                            location = locationManager
+                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+        return location;
     }
 
-    protected void startLocationUpdates() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+    public double getLatitude(){
+        if(location != null){
+            latitude = location.getLatitude();
+        }
+
+        // return latitude
+        return latitude;
+    }
+
+    public double getLongitude(){
+        if(location != null){
+            longitude = location.getLongitude();
+        }
+
+        // return longitude
+        return longitude;
     }
 
     @Override
-    public final void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Do something here if sensor accuracy changes.
+    public void onLocationChanged(Location location) {
     }
 
-    public final void onSensorChanged(SensorEvent event) {
-        // The light sensor returns a single value.
-        // Many sensors return 3 values, one for each axis.
-        // Do something with this sensor value.
+    public void stopUsingGPS(){
+        if(locationManager != null){
+            locationManager.removeUpdates(AcquisitionActivity.this);
+        }
     }
 
     @Override
@@ -58,16 +120,14 @@ public class AcquisitionActivity extends AppCompatActivity implements SensorEven
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acquisition);
 
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-
-        Pbar = (ProgressBar)findViewById(R.id.progress);
+        Pbar = (ProgressBar) findViewById(R.id.progress);
         Pbar.setVisibility(View.INVISIBLE);
 
-        AcqText = (TextView)findViewById(R.id.acqText);
+        AcqText = (TextView) findViewById(R.id.acqText);
         AcqText.setVisibility(View.INVISIBLE);
 
-        Button button_start = (Button)findViewById(R.id.startButton);
-        button_start.setOnClickListener(new View.OnClickListener(){
+        Button button_start = (Button) findViewById(R.id.startButton);
+        button_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.VISIBLE);
@@ -75,8 +135,8 @@ public class AcquisitionActivity extends AppCompatActivity implements SensorEven
             }
         });
 
-        Button button_stop = (Button)findViewById(R.id.stopButton);
-        button_stop.setOnClickListener(new View.OnClickListener(){
+        Button button_stop = (Button) findViewById(R.id.stopButton);
+        button_stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.INVISIBLE);
