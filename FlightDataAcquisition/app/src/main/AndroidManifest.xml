@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".AcquisitionActivity" />
-        <activity android:name=".LocationTool"></activity>
+        <activity android:name=".LocationTool" />
     </application>
 
 </manifest>

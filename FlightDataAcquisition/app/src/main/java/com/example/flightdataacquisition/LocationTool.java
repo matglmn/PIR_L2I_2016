@@ -1,5 +1,6 @@
 package com.example.flightdataacquisition;
 
+import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,12 +8,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-public class LocationTool extends AppCompatActivity implements LocationListener{
+public class LocationTool extends Service implements LocationListener{
 
     private final Context mContext;
 
@@ -93,22 +94,6 @@ public class LocationTool extends AppCompatActivity implements LocationListener{
         return longitude;
     }
 
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
     public void stopUsingGPS(){
         if(locationManager != null){
             try {
@@ -145,5 +130,26 @@ public class LocationTool extends AppCompatActivity implements LocationListener{
 
         // Showing Alert Message
         alertDialog.show();
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }
