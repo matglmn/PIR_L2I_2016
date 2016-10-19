@@ -10,13 +10,13 @@ import android.widget.TextView;
 
 public class AcquisitionActivity extends AppCompatActivity {
 
-    // Defines variables
+    // Define variables
     ProgressBar Pbar;
     TextView AcqText;
     double longitude;
     double latitude;
 
-    LocationTool gps = new LocationTool(this);
+    LocationTool gps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +36,11 @@ public class AcquisitionActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 if (gps.canGetLocation) {
+                    gps = new LocationTool(AcquisitionActivity.this);
+
                     Pbar.setVisibility(View.VISIBLE);
                     AcqText.setVisibility(View.VISIBLE);
+
                     latitude = gps.getLatitude();
                     longitude = gps.getLongitude();
                     AcqText.append("\n" + latitude + longitude);

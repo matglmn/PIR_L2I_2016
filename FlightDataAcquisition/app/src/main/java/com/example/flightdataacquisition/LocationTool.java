@@ -6,17 +6,16 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 public class LocationTool extends AppCompatActivity implements LocationListener{
 
     private final Context mContext;
 
-    // flag for GPS status
     boolean isGPSEnabled = false;
 
     boolean canGetLocation = false;
@@ -31,7 +30,6 @@ public class LocationTool extends AppCompatActivity implements LocationListener{
     // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 500; // 0.5 seconds
 
-    // Declaring a Location Manager
     protected LocationManager locationManager;
 
     public LocationTool(Context context) {
