@@ -21,14 +21,12 @@ public class LocationTool extends Service implements LocationListener{
 
     boolean canGetLocation = false;
 
-    Location location; // location
-    double latitude; // latitude
-    double longitude; // longitude
+    Location location;
+    double latitude;
+    double longitude;
 
-    // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 5; // 5 meters
 
-    // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 500; // 0.5 seconds
 
     protected LocationManager locationManager;
@@ -52,7 +50,6 @@ public class LocationTool extends Service implements LocationListener{
                 // No GPS Enabled...
             } else {
                 this.canGetLocation = true;
-                // if GPS Enabled get lat/long using GPS Services
                 if (location == null) {
                     locationManager.requestLocationUpdates(
                             LocationManager.GPS_PROVIDER,
@@ -81,7 +78,6 @@ public class LocationTool extends Service implements LocationListener{
             latitude = location.getLatitude();
         }
 
-        // return latitude
         return latitude;
     }
 
@@ -90,7 +86,6 @@ public class LocationTool extends Service implements LocationListener{
             longitude = location.getLongitude();
         }
 
-        // return longitude
         return longitude;
     }
 
@@ -107,13 +102,10 @@ public class LocationTool extends Service implements LocationListener{
     public void showSettingsAlert(){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
-        // Setting Dialog Title
         alertDialog.setTitle("GPS settings");
 
-        // Setting Dialog Message
         alertDialog.setMessage("GPS is not enabled. Do you want to change settings ?");
 
-        // On pressing Settings button
         alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -121,14 +113,12 @@ public class LocationTool extends Service implements LocationListener{
             }
         });
 
-        // On pressing cancel button
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });
 
-        // Showing Alert Message
         alertDialog.show();
     }
 
