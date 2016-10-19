@@ -13,6 +13,10 @@ public class AcquisitionActivity extends AppCompatActivity {
     // Defines variables
     ProgressBar Pbar;
     TextView AcqText;
+    double longitude;
+    double latitude;
+
+    LocationTool gps = new LocationTool(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,15 +31,26 @@ public class AcquisitionActivity extends AppCompatActivity {
 
         Button button_start = (Button) findViewById(R.id.startButton);
         button_start.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
-                Pbar.setVisibility(View.VISIBLE);
-                AcqText.setVisibility(View.VISIBLE);
+
+                if (gps.canGetLocation) {
+                    Pbar.setVisibility(View.VISIBLE);
+                    AcqText.setVisibility(View.VISIBLE);
+                    latitude = gps.getLatitude();
+                    longitude = gps.getLongitude();
+                    AcqText.append("\n" + latitude + longitude);
+                }
+                else {
+                    gps.showSettingsAlert();
+                }
             }
         });
 
         Button button_stop = (Button) findViewById(R.id.stopButton);
         button_stop.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Pbar.setVisibility(View.INVISIBLE);
