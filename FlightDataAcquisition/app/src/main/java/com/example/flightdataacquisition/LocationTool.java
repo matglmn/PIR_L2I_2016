@@ -1,6 +1,5 @@
 package com.example.flightdataacquisition;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,12 +7,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-public class LocationTool extends Service implements LocationListener{
+public class LocationTool extends AppCompatActivity implements LocationListener {
 
     private final Context mContext;
 
@@ -73,24 +72,24 @@ public class LocationTool extends Service implements LocationListener{
         return location;
     }
 
-    public double getLatitude(){
-        if(location != null){
+    public double getLatitude() {
+        if (location != null) {
             latitude = location.getLatitude();
         }
 
         return latitude;
     }
 
-    public double getLongitude(){
-        if(location != null){
+    public double getLongitude() {
+        if (location != null) {
             longitude = location.getLongitude();
         }
 
         return longitude;
     }
 
-    public void stopUsingGPS(){
-        if(locationManager != null){
+    public void stopUsingGPS() {
+        if (locationManager != null) {
             try {
                 locationManager.removeUpdates(LocationTool.this);
             } catch (SecurityException e) {
@@ -99,7 +98,7 @@ public class LocationTool extends Service implements LocationListener{
         }
     }
 
-    public void showSettingsAlert(){
+    public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
         alertDialog.setTitle("GPS settings");
@@ -107,7 +106,7 @@ public class LocationTool extends Service implements LocationListener{
         alertDialog.setMessage("GPS is not enabled. Do you want to change settings ?");
 
         alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog,int which) {
+            public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 mContext.startActivity(intent);
             }
@@ -136,10 +135,5 @@ public class LocationTool extends Service implements LocationListener{
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }
