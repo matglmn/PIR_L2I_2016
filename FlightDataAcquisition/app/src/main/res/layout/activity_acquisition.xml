@@ -75,6 +75,20 @@
                 android:text="@string/acquiring"
                 android:textSize="50sp" />
 
+            <TextView
+                android:id="@+id/longitude_textview"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="50sp"/>
+
+            <TextView
+                android:id="@+id/latitude_textview"
+                android:layout_gravity="end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="50sp"/>
+
         </LinearLayout>
 
         <Button

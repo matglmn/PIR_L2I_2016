@@ -11,38 +11,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-
 public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener{
+        GoogleApiClient.OnConnectionFailedListener {
 
     // Define variables
     ProgressBar Pbar;
     TextView AcqText;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = "AcquisitionActivity";
+    private TextView mLatitudeTextView;
+    private TextView mLongitudeTextView;
 
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-
-    private Location mLastLocation;
-
-    // Google client to interact with Google API
     private GoogleApiClient mGoogleApiClient;
+    private Location mLocation;
 
-    // boolean flag to toggle periodic location updates
-    private boolean mRequestingLocationUpdates = false;
-
-    private LocationRequest mLocationRequest;
-
-    // Location updates intervals in sec
-    private static int UPDATE_INTERVAL = 1000; // 1s
-    private static int FATEST_INTERVAL = 5000; // 5 sec
-    private static int DISPLACEMENT = 5; // 5 meters
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +40,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         AcqText = (TextView) findViewById(R.id.acqText);
         AcqText.setVisibility(View.INVISIBLE);
 
-        if (checkPlayServices()) {
-            buildGoogleApiClient();
-            createLocationRequest();
-        }
 
         Button button_start = (Button) findViewById(R.id.startButton);
         button_start.setOnClickListener(new View.OnClickListener() {
@@ -67,8 +48,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
             public void onClick(View v) {
                     Pbar.setVisibility(View.VISIBLE);
                     AcqText.setVisibility(View.VISIBLE);
-                    displayLocation();
-                    togglePeriodicLocationUpdates();
+
             }
         });
 
@@ -81,99 +61,21 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 AcqText.setVisibility(View.INVISIBLE);
             }
         });
-    }
 
-    private void displayLocation() {
+        mLatitudeTextView = (TextView) findViewById((R.id.latitude_textview));
+        mLongitudeTextView = (TextView) findViewById((R.id.longitude_textview));
 
-        try {
-            mLastLocation = LocationServices.FusedLocationApi
-                    .getLastLocation(mGoogleApiClient);
-
-            if (mLastLocation != null) {
-                double latitude = mLastLocation.getLatitude();
-                double longitude = mLastLocation.getLongitude();
-
-                AcqText.append(latitude + ", " + longitude);
-
-            } else {
-
-                AcqText
-                        .append("(Couldn't get the location. Make sure location is enabled on the device)");
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API).build();
-    }
-
-    protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
-        mLocationRequest.setFastestInterval(FATEST_INTERVAL);
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
-    }
-
-    private boolean checkPlayServices() {
-        int resultCode = GoogleApiAvailability.getInstance().
-                isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GoogleApiAvailability.getInstance().isUserResolvableError(resultCode)) {
-                GoogleApiAvailability.getInstance().getErrorDialog(this,
-                        resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Toast.makeText(getApplicationContext(),
-                        "This device is not supported.", Toast.LENGTH_LONG)
-                        .show();
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private void togglePeriodicLocationUpdates() {
-        if (!mRequestingLocationUpdates) {
-
-            mRequestingLocationUpdates = true;
-
-            startLocationUpdates();
-
-            Log.d(TAG, "Periodic location updates started!");
-
-        } else {
-
-            mRequestingLocationUpdates = false;
-
-            stopLocationUpdates();
-
-            Log.d(TAG, "Periodic location updates stopped!");
-        }
+                .addApi(LocationServices.API)
+                .build();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        checkPlayServices();
-
-        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -185,58 +87,28 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        stopLocationUpdates();
-    }
-
-    protected void startLocationUpdates() {
-
+    public void onConnected(Bundle bundle) {
         try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient, mLocationRequest, this);
-        } catch (SecurityException e) {
-            e.printStackTrace();
+        mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLocation != null) {
+            mLatitudeTextView.setText(String.valueOf(mLocation.getLatitude()));
+            mLongitudeTextView.setText(String.valueOf(mLocation.getLongitude()));
+        } else {
+            Toast.makeText(this, "Location not Detected", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    protected void stopLocationUpdates() {
-
-        try {
-            LocationServices.FusedLocationApi.removeLocationUpdates(
-                    mGoogleApiClient, this);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onConnected(Bundle arg0) {
-        displayLocation();
-
-        if (mRequestingLocationUpdates) {
-            startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int arg0) {
+    public void onConnectionSuspended(int i) {
+        Log.i(TAG, "Connection Suspended");
         mGoogleApiClient.connect();
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
-                + result.getErrorCode());
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLastLocation = location;
-
-        Toast.makeText(getApplicationContext(), "Location changed!",
-                Toast.LENGTH_SHORT).show();
-
-        displayLocation();
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.i(TAG, "Connection failed. Error: " + connectionResult.getErrorCode());
     }
 }
