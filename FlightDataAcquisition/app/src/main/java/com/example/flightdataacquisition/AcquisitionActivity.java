@@ -46,8 +46,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
             @Override
             public void onClick(View v) {
-                    Pbar.setVisibility(View.VISIBLE);
-                    AcqText.setVisibility(View.VISIBLE);
+                Pbar.setVisibility(View.VISIBLE);
+                AcqText.setVisibility(View.VISIBLE);
 
             }
         });
