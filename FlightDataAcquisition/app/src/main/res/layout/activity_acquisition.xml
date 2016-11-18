@@ -76,18 +76,18 @@
                 android:textSize="50sp" />
 
             <TextView
-                android:id="@+id/longitude_textview"
+                android:id="@+id/location_textview"
                 android:layout_gravity="end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="50sp"/>
+                android:textSize="30sp"/>
 
             <TextView
-                android:id="@+id/latitude_textview"
+                android:id="@+id/sensor_textview"
                 android:layout_gravity="end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="50sp"/>
+                android:textSize="18sp"/>
 
         </LinearLayout>
 

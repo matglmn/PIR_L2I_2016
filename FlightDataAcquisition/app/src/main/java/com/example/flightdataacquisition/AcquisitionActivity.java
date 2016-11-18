@@ -1,5 +1,10 @@
 package com.example.flightdataacquisition;
 
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +22,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+
 public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, LocationListener {
+        GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener{
 
     // Define variables
     ProgressBar Pbar;
@@ -29,23 +35,33 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
-
     private boolean mRequestLocationUpdates = false;
-
     private LocationRequest mLocationRequest;
 
-    private static int UPDATE_INTERVAL = 1000;
-    private static int FATEST_INTERVAL = 500;
-    private static int DISPLACEMENT = 10;
-
     private TextView lblLocation;
+    private TextView sensorTextview;
+
+    private SensorManager mSensorManager;
+    private Sensor accelerometer, magnetometer;
+
+    float[] accelerometerVector = new float[3];
+    float[] magneticVector = new float[3];
+    float[] resultMatrix=  new float[9];
+    float[] values = new float[3];
+
+    private float yaw, roll, pitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acquisition);
 
-        lblLocation = (TextView) findViewById(R.id.longitude_textview);
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        lblLocation = (TextView) findViewById(R.id.location_textview);
+        sensorTextview = (TextView) findViewById(R.id.sensor_textview);
 
         Pbar = (ProgressBar) findViewById(R.id.progress);
         Pbar.setVisibility(View.INVISIBLE);
@@ -66,6 +82,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 Pbar.setVisibility(View.VISIBLE);
                 AcqText.setVisibility(View.VISIBLE);
                 displayLocation();
+                displaySensorInfo();
                 mRequestLocationUpdates = true;
                 startLocationUpdates();
 
@@ -85,6 +102,32 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         });
     }
 
+    public void onSensorChanged(SensorEvent event){
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+           accelerometerVector = event.values;
+        }
+        else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+            magneticVector = event.values;
+        }
+        SensorManager.getRotationMatrix(resultMatrix, null, accelerometerVector, magneticVector);
+        SensorManager.getOrientation(resultMatrix, values);
+        // yaw
+        yaw =(float) Math.toDegrees(values[0]);
+        // pitch
+        pitch = (float) Math.toDegrees(values[1]);
+        // roll
+        roll = (float) Math.toDegrees(values[2]);
+    }
+
+    private void displaySensorInfo() {
+        sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -95,6 +138,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onResume() {
+        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
         super.onResume();
 
         checkPlayServices();
@@ -115,6 +160,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onPause() {
+        mSensorManager.unregisterListener(this, accelerometer);
+        mSensorManager.unregisterListener(this, magnetometer);
         super.onPause();
         stopLocationUpdates();
     }
@@ -127,9 +174,9 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         }
         if(mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
-            double longtitude = mLastLocation.getLongitude();
+            double longitude = mLastLocation.getLongitude();
 
-            lblLocation.setText(latitude + ", " + longtitude);
+            lblLocation.setText(latitude + ", " + longitude);
         } else {
             lblLocation.setText(R.string.loc_error);
         }
@@ -144,9 +191,12 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
+        int UPDATE_INTERVAL = 1000;
         mLocationRequest.setInterval(UPDATE_INTERVAL);
+        int FATEST_INTERVAL = 500;
         mLocationRequest.setFastestInterval(FATEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        int DISPLACEMENT = 10;
         mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
     }
 

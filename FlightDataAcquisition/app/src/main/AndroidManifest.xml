@@ -3,6 +3,8 @@
     package="com.example.flightdataacquisition">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
 
     <application
         android:name="android.support.multidex.MultiDexApplication"
@@ -21,7 +23,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AcquisitionActivity" />
+        <activity android:name=".AcquisitionActivity" android:screenOrientation="landscape" />
+        />
     </application>
 
 </manifest>
