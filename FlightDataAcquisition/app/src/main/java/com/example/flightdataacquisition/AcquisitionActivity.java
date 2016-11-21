@@ -101,6 +101,15 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 stopLocationUpdates();
             }
         });
+
+        Button button_marker = (Button) findViewById(R.id.markerButton);
+        button_marker.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                writeJSON();
+            }
+        });
     }
 
     public void startAcquisition() {
@@ -172,7 +181,24 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         stopLocationUpdates();
     }
 
-    private void displayLocation() {
+//    private void displayLocation() {
+//        try {
+//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        }
+//        if(mLastLocation != null) {
+//            double latitude = mLastLocation.getLatitude();
+//            double longitude = mLastLocation.getLongitude();
+//
+//            lblLocation.setText(latitude + ", " + longitude);
+//        } else {
+//            lblLocation.setText(R.string.loc_error);
+//        }
+//    }
+
+    // TEST JSON WRITING ###############################################
+    public double[] displayLocation() {
         try {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } catch (SecurityException e) {
@@ -181,10 +207,12 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         if(mLastLocation != null) {
             double latitude = mLastLocation.getLatitude();
             double longitude = mLastLocation.getLongitude();
+            double location[] = {latitude, longitude};
 
-            lblLocation.setText(latitude + ", " + longitude);
-        } else {
-            lblLocation.setText(R.string.loc_error);
+            return location;
+        }
+        else {
+            return null;
         }
     }
 
@@ -237,8 +265,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     public void writeJSON() {
         JSONObject object = new JSONObject();
         try {
-            object.put("longitude", displayLocation();
-            object.put("latitude", latitude);
+            object.put("latitude", displayLocation()[0]);
+            object.put("longitude", displayLocation()[1]);
             object.put("yaw", yaw);
             object.put("roll", roll);
             object.put("pitch", pitch);
