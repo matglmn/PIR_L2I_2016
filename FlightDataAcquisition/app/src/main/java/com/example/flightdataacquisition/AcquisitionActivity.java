@@ -22,6 +22,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener{
@@ -48,8 +51,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     float[] magneticVector = new float[3];
     float[] resultMatrix=  new float[9];
     float[] values = new float[3];
-
-    private float yaw, roll, pitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,11 +123,11 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         SensorManager.getRotationMatrix(resultMatrix, null, accelerometerVector, magneticVector);
         SensorManager.getOrientation(resultMatrix, values);
         // yaw
-        yaw =(float) Math.toDegrees(values[0]);
+        float yaw = (float) Math.toDegrees(values[0]);
         // pitch
-        pitch = (float) Math.toDegrees(values[1]);
+        float pitch = (float) Math.toDegrees(values[1]);
         // roll
-        roll = (float) Math.toDegrees(values[2]);
+        float roll = (float) Math.toDegrees(values[2]);
         sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
 
     }
@@ -231,6 +232,20 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    public void writeJSON() {
+        JSONObject object = new JSONObject();
+        try {
+            object.put("longitude", displayLocation();
+            object.put("latitude", latitude);
+            object.put("yaw", yaw);
+            object.put("roll", roll);
+            object.put("pitch", pitch);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        System.out.println(object);
     }
 
     @Override
