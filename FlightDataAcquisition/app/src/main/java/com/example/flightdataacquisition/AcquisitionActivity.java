@@ -82,10 +82,9 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 Pbar.setVisibility(View.VISIBLE);
                 AcqText.setVisibility(View.VISIBLE);
                 displayLocation();
-                displaySensorInfo();
                 mRequestLocationUpdates = true;
+                startAcquisition();
                 startLocationUpdates();
-
             }
         });
 
@@ -97,14 +96,25 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 Pbar.setVisibility(View.INVISIBLE);
                 AcqText.setVisibility(View.INVISIBLE);
                 mRequestLocationUpdates = false;
+                stopAcquisition();
                 stopLocationUpdates();
             }
         });
     }
 
+    public void startAcquisition() {
+        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
+        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+    }
+
+    public void stopAcquisition() {
+        mSensorManager.unregisterListener(this, accelerometer);
+        mSensorManager.unregisterListener(this, magnetometer);
+    }
+
     public void onSensorChanged(SensorEvent event){
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-           accelerometerVector = event.values;
+            accelerometerVector = event.values;
         }
         else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             magneticVector = event.values;
@@ -117,11 +127,10 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         pitch = (float) Math.toDegrees(values[1]);
         // roll
         roll = (float) Math.toDegrees(values[2]);
+        sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
+
     }
 
-    private void displaySensorInfo() {
-        sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
-    }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -138,8 +147,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onResume() {
-        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
         super.onResume();
 
         checkPlayServices();
@@ -160,8 +167,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onPause() {
-        mSensorManager.unregisterListener(this, accelerometer);
-        mSensorManager.unregisterListener(this, magnetometer);
         super.onPause();
         stopLocationUpdates();
     }

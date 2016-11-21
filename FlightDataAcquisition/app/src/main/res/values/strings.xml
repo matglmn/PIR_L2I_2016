@@ -8,5 +8,5 @@
     <string name="marker">Set \n Marker</string>
     <string name="acquisition_text">Acquisition Panel</string>
     <string name="acquiring">Acquiring data&#8230;</string>
-    <string name="loc_error">Couldn\'t get the location. Make sure location is enabled on the device</string>
+    <string name="loc_error">Couldn\'t get the location</string>
 </resources>
