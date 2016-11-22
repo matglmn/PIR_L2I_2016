@@ -25,6 +25,9 @@ import com.google.android.gms.location.LocationServices;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener{
@@ -51,6 +54,9 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     float[] magneticVector = new float[3];
     float[] resultMatrix=  new float[9];
     float[] values = new float[3];
+
+    double latitude, longitude;
+    float yaw, roll, pitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,8 +90,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 AcqText.setVisibility(View.VISIBLE);
                 displayLocation();
                 mRequestLocationUpdates = true;
-                startAcquisition();
                 startLocationUpdates();
+                startSensorAcquisition();
             }
         });
 
@@ -97,8 +103,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 Pbar.setVisibility(View.INVISIBLE);
                 AcqText.setVisibility(View.INVISIBLE);
                 mRequestLocationUpdates = false;
-                stopAcquisition();
                 stopLocationUpdates();
+                stopSensorAcquisition();
             }
         });
 
@@ -112,12 +118,12 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         });
     }
 
-    public void startAcquisition() {
-        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_UI);
-        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_UI);
+    public void startSensorAcquisition() {
+        mSensorManager.registerListener(this, accelerometer, 10000000);
+        mSensorManager.registerListener(this, magnetometer, 10000000);
     }
 
-    public void stopAcquisition() {
+    public void stopSensorAcquisition() {
         mSensorManager.unregisterListener(this, accelerometer);
         mSensorManager.unregisterListener(this, magnetometer);
     }
@@ -132,19 +138,17 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         SensorManager.getRotationMatrix(resultMatrix, null, accelerometerVector, magneticVector);
         SensorManager.getOrientation(resultMatrix, values);
         // yaw
-        float yaw = (float) Math.toDegrees(values[0]);
+        yaw = (float) Math.toDegrees(values[0]);
         // pitch
-        float pitch = (float) Math.toDegrees(values[1]);
+        pitch = (float) Math.toDegrees(values[1]);
         // roll
-        float roll = (float) Math.toDegrees(values[2]);
+        roll = (float) Math.toDegrees(values[2]);
         sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
-
     }
-
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+        // Not used
     }
 
     @Override
@@ -181,40 +185,72 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         stopLocationUpdates();
     }
 
-//    private void displayLocation() {
-//        try {
-//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//        } catch (SecurityException e) {
-//            e.printStackTrace();
-//        }
-//        if(mLastLocation != null) {
-//            double latitude = mLastLocation.getLatitude();
-//            double longitude = mLastLocation.getLongitude();
-//
-//            lblLocation.setText(latitude + ", " + longitude);
-//        } else {
-//            lblLocation.setText(R.string.loc_error);
-//        }
-//    }
-
-    // TEST JSON WRITING ###############################################
-    public double[] displayLocation() {
+    private void displayLocation() {
         try {
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
         if(mLastLocation != null) {
-            double latitude = mLastLocation.getLatitude();
-            double longitude = mLastLocation.getLongitude();
-            double location[] = {latitude, longitude};
+            latitude = mLastLocation.getLatitude();
+            longitude = mLastLocation.getLongitude();
 
-            return location;
-        }
-        else {
-            return null;
+            lblLocation.setText(latitude + ", " + longitude);
+        } else {
+            lblLocation.setText(R.string.loc_error);
         }
     }
+
+    // TEST JSON WRITING ###############################################
+
+    public void writeJSON() {
+
+        try {
+            JSONObject jsonObj = new JSONObject();
+            jsonObj.put("latitude", latitude);
+            jsonObj.put("longitude", longitude);
+            jsonObj.put("yaw", yaw);
+            jsonObj.put("roll", roll);
+            jsonObj.put("pitch", pitch);
+
+            FileWriter file = new FileWriter("/home/mgaulmin/AndroidStudioProjects/PIR_L2I_2016/" +
+                    "FlightDataAcquisition/JSONdata/data.txt");
+            file.write(jsonObj.toString());
+            System.out.println("Successfully saved acquired data...");
+            System.out.println("\nJSON Object: " + jsonObj);
+        }
+        catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+//    public double getLatitude() {
+//        try {
+//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (mLastLocation != null) {
+//            latitude = mLastLocation.getLatitude();
+//        }
+//        return latitude;
+//    }
+//
+//    public double getLongitude() {
+//        try {
+//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+//        } catch (SecurityException e) {
+//            e.printStackTrace();
+//        }
+//
+//        if (mLastLocation != null) {
+//            longitude = mLastLocation.getLongitude();
+//        }
+//        return longitude;
+//    }
+
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -260,20 +296,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
-    }
-
-    public void writeJSON() {
-        JSONObject object = new JSONObject();
-        try {
-            object.put("latitude", displayLocation()[0]);
-            object.put("longitude", displayLocation()[1]);
-            object.put("yaw", yaw);
-            object.put("roll", roll);
-            object.put("pitch", pitch);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        System.out.println(object);
     }
 
     @Override
