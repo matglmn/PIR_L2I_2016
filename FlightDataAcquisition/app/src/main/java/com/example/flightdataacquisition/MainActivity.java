@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    /** Called when the user clicks the get started button */
+    /* Called when the user clicks the get started button */
     public void sendStarted(View view) {
         Intent intent = new Intent(this, AcquisitionActivity.class);
         startActivity(intent);

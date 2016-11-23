@@ -32,58 +32,66 @@ import java.io.IOException;
 import java.util.Calendar;
 
 
-public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+public class AcquisitionActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener, SensorEventListener{
 
-    // Define variables
-    ProgressBar Pbar;
-    TextView AcqText;
-
-    private static final String TAG = AcquisitionActivity.class.getSimpleName();
-    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
-
-    private Location mLastLocation;
-    private GoogleApiClient mGoogleApiClient;
-    private boolean mRequestLocationUpdates = false;
-    private LocationRequest mLocationRequest;
-
+    // Define interface objects
+    private ProgressBar Pbar;
+    private TextView AcqText;
     private TextView lblLocation;
-    private TextView sensorTextview;
+//    private TextView sensorTextview;
 
-    private SensorManager mSensorManager;
-    private Sensor accelerometer, magnetometer;
-
+    // Objects used to get aircraft angles
     float[] accelerometerVector = new float[3];
     float[] magneticVector = new float[3];
     float[] resultMatrix=  new float[9];
     float[] values = new float[3];
 
+    // Data variables
     double latitude, longitude;
     float yaw, roll, pitch;
+
+    private static final String TAG = AcquisitionActivity.class.getSimpleName();
+    private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
+
+    // Location objects creation
+    private Location mLastLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private boolean mRequestLocationUpdates = false;
+    private LocationRequest mLocationRequest;
+
+    //Sensor objects creation
+    private SensorManager mSensorManager;
+    private Sensor accelerometer, magnetometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_acquisition);
 
+        // Set acceleration and magnetic sensors
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
+        // Retrieves interface objects from XML activity file
         lblLocation = (TextView) findViewById(R.id.location_textview);
-        sensorTextview = (TextView) findViewById(R.id.sensor_textview);
-
+//        sensorTextview = (TextView) findViewById(R.id.sensor_textview);
         Pbar = (ProgressBar) findViewById(R.id.progress);
-        Pbar.setVisibility(View.INVISIBLE);
-
         AcqText = (TextView) findViewById(R.id.acqText);
+
+        // Sets invisible objects before acquisition start
+        Pbar.setVisibility(View.INVISIBLE);
         AcqText.setVisibility(View.INVISIBLE);
 
+        // Checks Play Services availability and create GoogleApiClient instance
         if(checkPlayServices()) {
             buildGoogleApiClient();
             createLocationRequest();
         }
 
+        // Sets acquisition start button
         Button button_start = (Button) findViewById(R.id.startButton);
         button_start.setOnClickListener(new View.OnClickListener() {
 
@@ -93,11 +101,12 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 AcqText.setVisibility(View.VISIBLE);
                 displayLocation();
                 mRequestLocationUpdates = true;
-                startLocationUpdates();
-                startSensorAcquisition();
+                startLocationUpdates();     //                  Start
+                startSensorAcquisition();   //      Location and Sensor acquisition
             }
         });
 
+        // Sets acquisition stop button
         Button button_stop = (Button) findViewById(R.id.stopButton);
         button_stop.setOnClickListener(new View.OnClickListener() {
 
@@ -106,8 +115,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 Pbar.setVisibility(View.INVISIBLE);
                 AcqText.setVisibility(View.INVISIBLE);
                 mRequestLocationUpdates = false;
-                stopLocationUpdates();
-                stopSensorAcquisition();
+                stopLocationUpdates();  //                      Stop
+                stopSensorAcquisition();    //               Acquisition
             }
         });
 
@@ -118,35 +127,38 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
             public void onClick(View v) {
                 writeJSON();
             }
-        });
+        });     // Writes data in JSON file
     }
 
     public void startSensorAcquisition() {
-        mSensorManager.registerListener(this, accelerometer, 10000000);
-        mSensorManager.registerListener(this, magnetometer, 10000000);
+        // Starts listening of sensors
+        mSensorManager.registerListener(this, accelerometer, 1000000);
+        mSensorManager.registerListener(this, magnetometer, 1000000);
     }
 
     public void stopSensorAcquisition() {
+        // Stops listening of sensors
         mSensorManager.unregisterListener(this, accelerometer);
         mSensorManager.unregisterListener(this, magnetometer);
     }
 
     public void onSensorChanged(SensorEvent event){
+        // Updates sensor values continuously
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             accelerometerVector = event.values;
         }
         else if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             magneticVector = event.values;
         }
+
+        // Gets orientation values from rotation matrix with acceleration and geomagnetic field
         SensorManager.getRotationMatrix(resultMatrix, null, accelerometerVector, magneticVector);
         SensorManager.getOrientation(resultMatrix, values);
-        // yaw
+
+        // Aircraft angles
         yaw = (float) Math.toDegrees(values[0]);
-        // pitch
         pitch = (float) Math.toDegrees(values[1]);
-        // roll
         roll = (float) Math.toDegrees(values[2]);
-        sensorTextview.setText("yaw:" + yaw + " " + "roll:" + roll + " " + "pitch:" + pitch);
     }
 
     @Override
@@ -172,7 +184,6 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
@@ -189,12 +200,15 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     private void displayLocation() {
+        // Displays location on dedicated textview (may be deleted)
         try {
+            // Gets last GPS location
             mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
         if(mLastLocation != null) {
+            // Gets latitude and longitude
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
 
@@ -205,7 +219,8 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     public void writeJSON() {
-
+        // Writes acquired data in JSON file
+        // Data file name format : MMDDYYYY_HHMMSS_data.txt
         try {
             Calendar rightNow = Calendar.getInstance();
             String curYear = String.valueOf(rightNow.get(Calendar.YEAR));
@@ -220,11 +235,11 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
             File dataFile = new File((Environment.getExternalStorageDirectory() +
                     File.separator + "FlightDataAcquisition"
                     + File.separator + curMonth + curDay + curYear
-                    + "_" + time + "_" + "Data.txt"));
+                    + "_" + time + "_" + "data.txt"));
             Boolean success=true;
 
             if (!saveDir.exists()) {
-                success = saveDir.mkdir();
+                success = saveDir.mkdir();  // Creates data directory if it doesn't exists
             }
             if (success){
                 JSONObject jsonObj = new JSONObject();
@@ -234,6 +249,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 jsonObj.put("roll", roll);
                 jsonObj.put("pitch", pitch);
 
+                // Convertx JSONObject to string in data file
                 String acquiredData = jsonObj.toString();
                 FileOutputStream output = new FileOutputStream(dataFile, true);
                 output.write(acquiredData.getBytes());
@@ -241,7 +257,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
                 System.out.println("Successfully saved acquired data...");
                 System.out.println("\nJSON Object: " + jsonObj);
             }
-            else {Log.e("TEST1","ERROR IN DIRECTORY CREATION");}
+            else {Log.e("FlightDataAcquisition", "ERROR IN DIRECTORY CREATION");}
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();
@@ -249,6 +265,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     protected synchronized void buildGoogleApiClient() {
+        // Creates GoogleApiClient instance
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -256,24 +273,28 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     protected void createLocationRequest() {
+        // Creates a location request with updating intervals
         mLocationRequest = new LocationRequest();
-        int UPDATE_INTERVAL = 1000;
+        int UPDATE_INTERVAL = 1000; // in milliseconds
         mLocationRequest.setInterval(UPDATE_INTERVAL);
-        int FATEST_INTERVAL = 500;
+        int FATEST_INTERVAL = 500; // in milliseconds
         mLocationRequest.setFastestInterval(FATEST_INTERVAL);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        int DISPLACEMENT = 10;
+        int DISPLACEMENT = 10; // in meters
         mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
     }
 
     private boolean checkPlayServices() {
+        // Checks Google Play Services availability
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int resultCode = googleAPI.isGooglePlayServicesAvailable(this);
         if(resultCode != ConnectionResult.SUCCESS) {
             if(googleAPI.isUserResolvableError(resultCode)) {
-                googleAPI.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                googleAPI.getErrorDialog(this, resultCode,
+                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
-                Toast.makeText(getApplicationContext(), "This device is not supported", Toast.LENGTH_LONG)
+                Toast.makeText(getApplicationContext(), "This device is not supported",
+                        Toast.LENGTH_LONG)
                         .show();
                 finish();
             }
@@ -283,19 +304,23 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
     }
 
     protected void startLocationUpdates() {
+        // Starts location updates when clicking on acquisition start button
         try {
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+                    mLocationRequest, this);
         } catch (SecurityException e) {
             e.printStackTrace();
         }
     }
 
     protected void stopLocationUpdates() {
+        // Stops location updates when clicking on acquisition stop button
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
     @Override
     public void onConnected(Bundle bundle) {
+        // Displays location on connection
         displayLocation();
 
         if(mRequestLocationUpdates) {
@@ -310,6 +335,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onLocationChanged(Location location) {
+        // Delivers location update message and updates location
         mLastLocation = location;
 
         Toast.makeText(getApplicationContext(), "Location changed!", Toast.LENGTH_SHORT).show();
@@ -319,6 +345,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Returns an error message if connection fails
         Log.i(TAG, "Connection failed: " + connectionResult.getErrorCode());
     }
 }
