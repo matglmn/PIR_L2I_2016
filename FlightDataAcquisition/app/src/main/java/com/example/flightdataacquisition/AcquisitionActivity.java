@@ -7,6 +7,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +26,10 @@ import com.google.android.gms.location.LocationServices;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
 
 
 public class AcquisitionActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
@@ -201,55 +204,49 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    // TEST JSON WRITING ###############################################
-
     public void writeJSON() {
 
         try {
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put("latitude", latitude);
-            jsonObj.put("longitude", longitude);
-            jsonObj.put("yaw", yaw);
-            jsonObj.put("roll", roll);
-            jsonObj.put("pitch", pitch);
+            Calendar rightNow = Calendar.getInstance();
+            String curYear = String.valueOf(rightNow.get(Calendar.YEAR));
+            String curDay = String.valueOf(rightNow.get(Calendar.DAY_OF_MONTH));
+            String curMonth = String.valueOf(rightNow.get(Calendar.MONTH) + 1);
+            String time = String.valueOf(rightNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(rightNow.get(Calendar.MINUTE))
+                    + String.valueOf(rightNow.get(Calendar.SECOND));
+            System.out.println(time);
 
-            FileWriter file = new FileWriter("/home/mgaulmin/AndroidStudioProjects/PIR_L2I_2016/FlightDataAcquisition/JSONdata/data.txt.txt");
-            file.write(jsonObj.toString());
-            System.out.println("Successfully saved acquired data...");
-            System.out.println("\nJSON Object: " + jsonObj);
+            File saveDir = new File(Environment.getExternalStorageDirectory() +
+                    File.separator + "FlightDataAcquisition");
+            File dataFile = new File((Environment.getExternalStorageDirectory() +
+                    File.separator + "FlightDataAcquisition"
+                    + File.separator + curMonth + curDay + curYear
+                    + "_" + time + "_" + "Data.txt"));
+            Boolean success=true;
+
+            if (!saveDir.exists()) {
+                success = saveDir.mkdir();
+            }
+            if (success){
+                JSONObject jsonObj = new JSONObject();
+                jsonObj.put("latitude", latitude);
+                jsonObj.put("longitude", longitude);
+                jsonObj.put("yaw", yaw);
+                jsonObj.put("roll", roll);
+                jsonObj.put("pitch", pitch);
+
+                String acquiredData = jsonObj.toString();
+                FileOutputStream output = new FileOutputStream(dataFile, true);
+                output.write(acquiredData.getBytes());
+
+                System.out.println("Successfully saved acquired data...");
+                System.out.println("\nJSON Object: " + jsonObj);
+            }
+            else {Log.e("TEST1","ERROR IN DIRECTORY CREATION");}
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();
         }
     }
-
-
-//    public double getLatitude() {
-//        try {
-//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//        } catch (SecurityException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (mLastLocation != null) {
-//            latitude = mLastLocation.getLatitude();
-//        }
-//        return latitude;
-//    }
-//
-//    public double getLongitude() {
-//        try {
-//            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-//        } catch (SecurityException e) {
-//            e.printStackTrace();
-//        }
-//
-//        if (mLastLocation != null) {
-//            longitude = mLastLocation.getLongitude();
-//        }
-//        return longitude;
-//    }
-
 
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(this)
