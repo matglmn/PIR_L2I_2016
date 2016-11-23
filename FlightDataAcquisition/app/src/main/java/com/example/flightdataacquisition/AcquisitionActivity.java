@@ -213,7 +213,7 @@ public class AcquisitionActivity extends AppCompatActivity implements GoogleApiC
             jsonObj.put("roll", roll);
             jsonObj.put("pitch", pitch);
 
-            FileWriter file = new FileWriter("file:///home/mgaulmin/AndroidStudioProjects/PIR_L2I_2016/FlightDataAcquisition/JSONdata/data.txt.txt");
+            FileWriter file = new FileWriter("/home/mgaulmin/AndroidStudioProjects/PIR_L2I_2016/FlightDataAcquisition/JSONdata/data.txt.txt");
             file.write(jsonObj.toString());
             System.out.println("Successfully saved acquired data...");
             System.out.println("\nJSON Object: " + jsonObj);
