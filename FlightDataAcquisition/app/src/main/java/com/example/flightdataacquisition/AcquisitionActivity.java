@@ -141,8 +141,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
 
     public void startSensorAcquisition() {
         // Starts listening of sensors
-        mSensorManager.registerListener(this, accelerometer, 1000000);
-        mSensorManager.registerListener(this, magnetometer, 1000000);
+        mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     public void stopSensorAcquisition() {
