@@ -55,6 +55,11 @@ public class AcquisitionActivity extends AppCompatActivity implements
     private static final String TAG = AcquisitionActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
+    // Data file creation variables
+    private boolean fileExists = false;
+    Boolean success;
+    File saveDir, dataFile;
+
     // Location objects creation
     private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
@@ -128,9 +133,10 @@ public class AcquisitionActivity extends AppCompatActivity implements
 
             @Override
             public void onClick(View v) {
-                writeJSON();
+                if (!fileExists) {createFiles();}
+                writeJSON(); // Writes data in JSON file
             }
-        });     // Writes data in JSON file
+        });
     }
 
     public void startSensorAcquisition() {
@@ -221,29 +227,35 @@ public class AcquisitionActivity extends AppCompatActivity implements
         }
     }
 
+    public void createFiles() {
+        // Creates data file and directory if it doesn't exists
+        // Data file name format : MMDDYYYY_HHMMSS_data.txt
+        Calendar rightNow = Calendar.getInstance();
+        String curYear = String.valueOf(rightNow.get(Calendar.YEAR));
+        String curDay = String.valueOf(rightNow.get(Calendar.DAY_OF_MONTH));
+        String curMonth = String.valueOf(rightNow.get(Calendar.MONTH) + 1);
+        String time = String.valueOf(rightNow.get(Calendar.HOUR_OF_DAY)) +
+                String.valueOf(rightNow.get(Calendar.MINUTE))
+                + String.valueOf(rightNow.get(Calendar.SECOND));
+
+        saveDir = new File(Environment.getExternalStorageDirectory() +
+                File.separator + "FlightDataAcquisition");
+        dataFile = new File((Environment.getExternalStorageDirectory() +
+                File.separator + "FlightDataAcquisition"
+                + File.separator + curMonth + curDay + curYear
+                + "_" + time + "_" + "data.txt"));
+        fileExists = true;
+        success = true;
+
+        if (!saveDir.exists()) {
+            success = saveDir.mkdir();  // Creates data directory if it doesn't exists
+        }
+    }
+
     public void writeJSON() {
         // Writes acquired data in JSON file
-        // Data file name format : MMDDYYYY_HHMMSS_data.txt
         try {
-            Calendar rightNow = Calendar.getInstance();
-            String curYear = String.valueOf(rightNow.get(Calendar.YEAR));
-            String curDay = String.valueOf(rightNow.get(Calendar.DAY_OF_MONTH));
-            String curMonth = String.valueOf(rightNow.get(Calendar.MONTH) + 1);
-            String time = String.valueOf(rightNow.get(Calendar.HOUR_OF_DAY)) + String.valueOf(rightNow.get(Calendar.MINUTE))
-                    + String.valueOf(rightNow.get(Calendar.SECOND));
-            System.out.println(time);
 
-            File saveDir = new File(Environment.getExternalStorageDirectory() +
-                    File.separator + "FlightDataAcquisition");
-            File dataFile = new File((Environment.getExternalStorageDirectory() +
-                    File.separator + "FlightDataAcquisition"
-                    + File.separator + curMonth + curDay + curYear
-                    + "_" + time + "_" + "data.txt"));
-            Boolean success=true;
-
-            if (!saveDir.exists()) {
-                success = saveDir.mkdir();  // Creates data directory if it doesn't exists
-            }
             if (success){
                 JSONObject jsonObj = new JSONObject();
                 jsonObj.put("latitude", latitude);
