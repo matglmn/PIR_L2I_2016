@@ -12,11 +12,7 @@
     android:gravity="center"
     tools:context="com.example.flightdataacquisition.AcquisitionActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/acquisition_text"
-        android:textSize="50sp"/>
+
 
     <LinearLayout
         android:id="@+id/horizLayout"
@@ -55,8 +51,16 @@
             android:id="@+id/acquiringLayout"
             android:orientation="vertical"
             android:layout_width="wrap_content"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center">
+
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/acquisition_text"
+                android:textSize="50sp"/>
 
             <ProgressBar
                 android:layout_marginStart="50dp"
@@ -68,32 +72,32 @@
                 android:layout_marginBottom="0dp"/>
 
             <TextView
-                android:id="@+id/acqText"
-                android:layout_gravity="end"
+                android:id="@+id/acqTextView"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/acquiring"
                 android:textSize="50sp" />
 
             <TextView
-                android:id="@+id/location_textview"
-                android:layout_gravity="end"
+                android:id="@+id/locationTextView"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="30sp"/>
 
             <TextView
-                android:id="@+id/sensor_textview"
-                android:layout_gravity="end"
+                android:id="@+id/dataTextView"
+                android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"/>
+                android:textSize="25sp"/>
 
         </LinearLayout>
 
         <Button
             android:id="@+id/markerButton"
-            android:layout_weight="0.5"
+            android:layout_weight="13"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/marker"

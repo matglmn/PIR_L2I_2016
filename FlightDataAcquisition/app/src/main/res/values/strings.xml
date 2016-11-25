@@ -9,4 +9,7 @@
     <string name="acquisition_text">Acquisition Panel</string>
     <string name="acquiring">Acquiring data&#8230;</string>
     <string name="loc_error">Couldn\'t get the location</string>
+    <string name="data_msg_ok">Data successfully saved !</string>
+    <string name="data_msg_fail">Error while saving data…</string>
+    <string name="acq_stop">Acquisition stopped</string>
 </resources>

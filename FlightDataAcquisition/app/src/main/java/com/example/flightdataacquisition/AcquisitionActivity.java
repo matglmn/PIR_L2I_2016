@@ -40,7 +40,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
     private ProgressBar Pbar;
     private TextView AcqText;
     private TextView lblLocation;
-//    private TextView sensorTextview;
+    private TextView dataTextView;
 
     // Objects used to get aircraft angles
     float[] accelerometerVector = new float[3];
@@ -76,10 +76,10 @@ public class AcquisitionActivity extends AppCompatActivity implements
         magnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         // Retrieves interface objects from XML activity file
-        lblLocation = (TextView) findViewById(R.id.location_textview);
-//        sensorTextview = (TextView) findViewById(R.id.sensor_textview);
+        lblLocation = (TextView) findViewById(R.id.locationTextView);
+        dataTextView = (TextView) findViewById(R.id.dataTextView);
         Pbar = (ProgressBar) findViewById(R.id.progress);
-        AcqText = (TextView) findViewById(R.id.acqText);
+        AcqText = (TextView) findViewById(R.id.acqTextView);
 
         // Sets invisible objects before acquisition start
         Pbar.setVisibility(View.INVISIBLE);
@@ -101,6 +101,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 AcqText.setVisibility(View.VISIBLE);
                 displayLocation();
                 mRequestLocationUpdates = true;
+                dataTextView.setText("");
                 startLocationUpdates();     //                  Start
                 startSensorAcquisition();   //      Location and Sensor acquisition
             }
@@ -117,6 +118,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 mRequestLocationUpdates = false;
                 stopLocationUpdates();  //                      Stop
                 stopSensorAcquisition();    //               Acquisition
+                lblLocation.setText("");
+                dataTextView.setText(R.string.acq_stop);
             }
         });
 
@@ -254,10 +257,14 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 FileOutputStream output = new FileOutputStream(dataFile, true);
                 output.write(acquiredData.getBytes());
 
-                System.out.println("Successfully saved acquired data...");
+                dataTextView.setText(R.string.data_msg_ok);
+                System.out.println("Successfully saved acquired data !");
                 System.out.println("\nJSON Object: " + jsonObj);
             }
-            else {Log.e("FlightDataAcquisition", "ERROR IN DIRECTORY CREATION");}
+            else {
+                Log.e("FlightDataAcquisition", "ERROR IN DIRECTORY CREATION");
+                dataTextView.setText(R.string.data_msg_fail);
+            }
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();
