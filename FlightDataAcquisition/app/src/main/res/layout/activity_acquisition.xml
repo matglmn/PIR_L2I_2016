@@ -12,8 +12,6 @@
     android:gravity="center"
     tools:context="com.example.flightdataacquisition.AcquisitionActivity">
 
-
-
     <LinearLayout
         android:id="@+id/horizLayout"
         android:layout_width="match_parent"
