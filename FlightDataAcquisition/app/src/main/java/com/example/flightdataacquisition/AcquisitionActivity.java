@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -52,7 +51,6 @@ public class AcquisitionActivity extends AppCompatActivity implements
     double latitude, longitude, altitude;
     float yaw, roll, pitch;
 
-    private static final String TAG = AcquisitionActivity.class.getSimpleName();
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
     // Data file creation variables
@@ -283,7 +281,6 @@ public class AcquisitionActivity extends AppCompatActivity implements
                         Toast.LENGTH_SHORT).show();
             }
             else {
-                Log.e("FlightDataAcquisition", "ERROR IN DIRECTORY CREATION");
                 dataTextView.setText(R.string.data_msg_fail);
             }
         }
@@ -374,6 +371,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // Returns an error message if connection fails
-        Log.i(TAG, "Connection failed: " + connectionResult.getErrorCode());
+        Toast.makeText(getApplicationContext(), "Connection failed, check your system parameters",
+                Toast.LENGTH_SHORT).show();
     }
 }
