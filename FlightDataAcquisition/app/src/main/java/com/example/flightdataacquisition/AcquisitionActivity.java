@@ -49,7 +49,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
     float[] values = new float[3];
 
     // Data variables
-    double latitude, longitude;
+    double latitude, longitude, altitude;
     float yaw, roll, pitch;
 
     private static final String TAG = AcquisitionActivity.class.getSimpleName();
@@ -124,7 +124,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 stopLocationUpdates();  //                      Stop
                 stopSensorAcquisition();    //               Acquisition
                 lblLocation.setText("");
-                dataTextView.setText(R.string.acq_stop);
+                Toast.makeText(getApplicationContext(), R.string.acq_stop,
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -133,8 +134,15 @@ public class AcquisitionActivity extends AppCompatActivity implements
 
             @Override
             public void onClick(View v) {
-                if (!fileExists) {createFiles();}
-                writeJSON(); // Writes data in JSON file
+                if (mRequestLocationUpdates)
+                {
+                    if (!fileExists) {createFiles();}
+                    writeJSON(); // Writes data in JSON file
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), "Please start acquisition first",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -217,11 +225,12 @@ public class AcquisitionActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         if(mLastLocation != null) {
-            // Gets latitude and longitude
+            // Gets altitude, latitude and longitude
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
+            altitude = mLastLocation.getAltitude();
 
-            lblLocation.setText(latitude + ", " + longitude);
+            lblLocation.setText(latitude + ", " + longitude + ", " + altitude);
         } else {
             lblLocation.setText(R.string.loc_error);
         }
@@ -260,6 +269,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 JSONObject jsonObj = new JSONObject();
                 jsonObj.put("latitude", latitude);
                 jsonObj.put("longitude", longitude);
+                jsonObj.put("altitude", altitude);
                 jsonObj.put("yaw", yaw);
                 jsonObj.put("roll", roll);
                 jsonObj.put("pitch", pitch);
@@ -269,9 +279,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 FileOutputStream output = new FileOutputStream(dataFile, true);
                 output.write(acquiredData.getBytes());
 
-                dataTextView.setText(R.string.data_msg_ok);
-                System.out.println("Successfully saved acquired data !");
-                System.out.println("\nJSON Object: " + jsonObj);
+                Toast.makeText(getApplicationContext(), R.string.data_msg_ok,
+                        Toast.LENGTH_SHORT).show();
             }
             else {
                 Log.e("FlightDataAcquisition", "ERROR IN DIRECTORY CREATION");
