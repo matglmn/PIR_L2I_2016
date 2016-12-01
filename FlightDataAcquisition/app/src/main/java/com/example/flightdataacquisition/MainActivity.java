@@ -17,5 +17,11 @@ public class MainActivity extends AppCompatActivity {
     public void sendStarted(View view) {
         Intent intent = new Intent(this, AcquisitionActivity.class);
         startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }

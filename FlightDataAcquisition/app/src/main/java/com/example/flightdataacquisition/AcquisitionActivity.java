@@ -49,6 +49,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
 
     // Data variables
     double latitude, longitude, altitude;
+    float speed;
     float yaw, roll, pitch;
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
@@ -227,8 +228,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
             latitude = mLastLocation.getLatitude();
             longitude = mLastLocation.getLongitude();
             altitude = mLastLocation.getAltitude();
-
-            lblLocation.setText(latitude + ", " + longitude + ", " + altitude);
+            speed = mLastLocation.getSpeed();
+            lblLocation.setText(latitude + ", " + longitude + "\n" + altitude + ", " + speed);
         } else {
             lblLocation.setText(R.string.loc_error);
         }
@@ -262,12 +263,12 @@ public class AcquisitionActivity extends AppCompatActivity implements
     public void writeJSON() {
         // Writes acquired data in JSON file
         try {
-
             if (success){
                 JSONObject jsonObj = new JSONObject();
                 jsonObj.put("latitude", latitude);
                 jsonObj.put("longitude", longitude);
                 jsonObj.put("altitude", altitude);
+                jsonObj.put("speed", speed);
                 jsonObj.put("yaw", yaw);
                 jsonObj.put("roll", roll);
                 jsonObj.put("pitch", pitch);
@@ -362,7 +363,6 @@ public class AcquisitionActivity extends AppCompatActivity implements
     public void onLocationChanged(Location location) {
         // Delivers location update message and updates location
         mLastLocation = location;
-
         Toast.makeText(getApplicationContext(), "Location changed!", Toast.LENGTH_SHORT).show();
 
         displayLocation();
@@ -373,5 +373,11 @@ public class AcquisitionActivity extends AppCompatActivity implements
         // Returns an error message if connection fails
         Toast.makeText(getApplicationContext(), "Connection failed, check your system parameters",
                 Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Closes application when pressing back button
+        finish();
     }
 }
