@@ -10,11 +10,15 @@ class DataToSim(QtGui.QMainWindow, ui.Ui_DataToSim):
         self.setupUi(self)
 
     def selectfile(self):
-        self.pathLineEdit.setText(QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME")))
+        self.pathLineEdit.setText(QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME"),
+                                                                    "Text files (*.txt *.data *.sav *.log)"))
+        if self.pathLineEdit.text() == "":
+            self.nextButton.setDisabled(True)
+        else:
+            self.nextButton.setEnabled(True)
 
     def main(self):
-        if self.pathLineEdit.text() == None:
-            self.nextButton.setDisabled()
+        self.nextButton.setDisabled(True)
         self.browseButton.clicked.connect(self.selectfile)
         self.closeButton.clicked.connect(app.exit)
         self.show()
