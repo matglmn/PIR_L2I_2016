@@ -28,7 +28,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class AcquisitionActivity extends AppCompatActivity implements
@@ -51,6 +54,8 @@ public class AcquisitionActivity extends AppCompatActivity implements
     double latitude, longitude, altitude;
     float speed;
     float yaw, roll, pitch;
+
+    long acqTime;
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
@@ -264,7 +269,11 @@ public class AcquisitionActivity extends AppCompatActivity implements
         // Writes acquired data in JSON file
         try {
             if (success){
+                long millis = System.currentTimeMillis();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm", Locale.getDefault());
+                Date resultdate = new Date(millis);
                 JSONObject jsonObj = new JSONObject();
+                jsonObj.put("date", resultdate);
                 jsonObj.put("latitude", latitude);
                 jsonObj.put("longitude", longitude);
                 jsonObj.put("altitude", altitude);
