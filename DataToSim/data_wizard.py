@@ -1,6 +1,7 @@
 from PyQt4 import QtGui
 import os
 import sys
+import json
 
 
 class DataWizard(QtGui.QWizard):
