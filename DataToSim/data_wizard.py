@@ -45,17 +45,38 @@ class Page1(QtGui.QWizardPage):
         self.setLayout(vertlayout)
 
         self.registerField("*", self.pathLineEdit)
-        self.browseButton.clicked.connect(self.selectfile)
+        self.browseButton.clicked.connect(self.selectFile)
 
-    def selectfile(self):
-        self.pathLineEdit.setText(QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME"),
-                                                                    "Text files (*.txt *.data *.sav *.log)"))
+        print(self.getDataFile())
 
+
+    def selectFile(self):
+        self.datafile_path = QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME"),
+                                                                    "Text files (*.txt *.data *.sav *.log)")
+        self.pathLineEdit.setText(self.datafile_path)
+
+
+    def getDataFile(self):
+        self.datafile_path = self.pathLineEdit.text()
+        return self.datafile_path
 
 
 class Page2(QtGui.QWizardPage):
     def __init__(self, parent=None):
         super(Page2, self).__init__(parent)
+
+        self.data_file = Page1.getDataFile(self)
+        self.parseDataFile(self.data_file)
+
+    def parseDataFile(self, data_file):
+        with open(self.data_file) as f:
+            lines = [line.rstrip('\n') for line in f]
+
+        return lines
+
+
+
+
 
 
 if __name__ == '__main__':
