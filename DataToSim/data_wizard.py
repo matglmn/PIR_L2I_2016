@@ -44,10 +44,8 @@ class Page1(QtGui.QWizardPage):
 
         self.setLayout(vertlayout)
 
-        self.registerField("*", self.pathLineEdit)
+        self.registerField("path*", self.pathLineEdit)
         self.browseButton.clicked.connect(self.selectFile)
-
-        print(self.getDataFile())
 
 
     def selectFile(self):
@@ -56,27 +54,29 @@ class Page1(QtGui.QWizardPage):
         self.pathLineEdit.setText(self.datafile_path)
 
 
-    def getDataFile(self):
-        self.datafile_path = self.pathLineEdit.text()
-        return self.datafile_path
-
-
 class Page2(QtGui.QWizardPage):
     def __init__(self, parent=None):
         super(Page2, self).__init__(parent)
+        self.vertlayout = QtGui.QVBoxLayout()
+        self.setLayout(self.vertlayout)
 
-        self.data_file = Page1.getDataFile(self)
-        self.parseDataFile(self.data_file)
+    def initializePage(self):
+        self.file_path = str(self.field("path"))
+        self.file_lines = self.parseDataFile(self.file_path)
+        self.setCheckBoxes(self.file_lines)
+
+    def setCheckBoxes(self, lines):
+        for i in range(len(lines)):
+            self.choice = QtGui.QRadioButton()
+            self.choice.setText(str(lines[i]))
+            self.vertlayout.addWidget(self.choice)
+
 
     def parseDataFile(self, data_file):
-        with open(self.data_file) as f:
+        with open(data_file) as f:
             lines = [line.rstrip('\n') for line in f]
 
         return lines
-
-
-
-
 
 
 if __name__ == '__main__':
