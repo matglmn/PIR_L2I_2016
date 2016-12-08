@@ -256,7 +256,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
         dataFile = new File((Environment.getExternalStorageDirectory() +
                 File.separator + "FlightDataAcquisition"
                 + File.separator + curMonth + curDay + curYear
-                + "_" + time + "_" + "data.txt"));
+                + "_" + time + "_" + "data.json"));
         fileExists = true;
         success = true;
 
