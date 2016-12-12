@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,7 +56,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
     float speed;
     float yaw, roll, pitch;
 
-    long acqTime;
+    JSONArray jsonArray = new JSONArray();
 
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 1000;
 
@@ -128,6 +129,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 stopLocationUpdates();  //                      Stop
                 stopSensorAcquisition();    //               Acquisition
                 lblLocation.setText("");
+                generateJSONFile();
                 Toast.makeText(getApplicationContext(), R.string.acq_stop,
                         Toast.LENGTH_SHORT).show();
             }
@@ -281,11 +283,7 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 jsonObj.put("yaw", yaw);
                 jsonObj.put("roll", roll);
                 jsonObj.put("pitch", pitch);
-
-                // Convertx JSONObject to string in data file
-                String acquiredData = jsonObj.toString();
-                FileOutputStream output = new FileOutputStream(dataFile, true);
-                output.write(acquiredData.getBytes());
+                jsonArray.put(jsonObj);
 
                 Toast.makeText(getApplicationContext(), R.string.data_msg_ok,
                         Toast.LENGTH_SHORT).show();
@@ -294,7 +292,19 @@ public class AcquisitionActivity extends AppCompatActivity implements
                 dataTextView.setText(R.string.data_msg_fail);
             }
         }
-        catch (IOException | JSONException e) {
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateJSONFile() {
+        // Convertx JSONArray to string in data file
+        try {
+            String acquiredData = jsonArray.toString();
+            FileOutputStream output = new FileOutputStream(dataFile, true);
+            output.write(acquiredData.getBytes());
+        } catch (IOException e)
+        {
             e.printStackTrace();
         }
     }
