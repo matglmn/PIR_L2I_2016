@@ -2,7 +2,6 @@ from PyQt4 import QtGui
 import os
 import sys
 import json
-import pdb
 
 
 def parseDataFile(data_file):
@@ -20,6 +19,8 @@ class DataWizard(QtGui.QWizard):
         self.addPage(Page1())
         self.addPage(Page2())
         self.addPage(Page3())
+        self.setOption(self.HaveFinishButtonOnEarlyPages)
+        self.setOption(self.NoBackButtonOnStartPage)
 
 
 class Page1(QtGui.QWizardPage):
@@ -32,14 +33,15 @@ class Page1(QtGui.QWizardPage):
         self.introLabel = QtGui.QLabel()
 
         self.pathLabel.setText("File path :")
-        self.introLabel.setText("Welcome on Data to Sim. You can use this application to run acquired data into a simulator !"
-                           "\n\nSelect the data file that you want to load into the flight simulator in the following bar. "
+        self.introLabel.setText("Welcome on Data to Sim. You can use this application to run "
+                                "acquired data into a simulator !"
+                           "\n\nSelect the data file that you want to load into the "
+                                "flight simulator in the following bar. "
                            "\nData will be used to start a simple simulation with the acquired parameters.")
         self.browseButton.setText("Browse...")
 
         vertspacer1 = QtGui.QSpacerItem(20, 50)
         vertspacer2 = QtGui.QSpacerItem(20, 50)
-
 
         horizlayout = QtGui.QHBoxLayout()
         horizlayout.addWidget(self.pathLabel)
@@ -59,7 +61,7 @@ class Page1(QtGui.QWizardPage):
 
     def selectFile(self):
         self.datafile_path = QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME"),
-                                                                    "Text files (*.json *.txt)")
+                                                               "Text files (*.json *.txt)")
         self.pathLineEdit.setText(self.datafile_path)
 
 
@@ -85,7 +87,7 @@ class Page2(QtGui.QWizardPage):
 
     def initializePage(self):
         self.file_path = str(self.field("path"))
-        self.data_obj= parseDataFile(self.file_path)
+        self.data_obj = parseDataFile(self.file_path)
         self.setCheckBoxes(self.data_obj)
 
     def setCheckBoxes(self, data):
@@ -135,7 +137,6 @@ class Page3(QtGui.QWizardPage):
         self.vertlayout.addWidget(self.roll_edit)
         self.vertlayout.addWidget(self.pitch_label)
         self.vertlayout.addWidget(self.pitch_edit)
-
         self.setLayout(self.vertlayout)
 
     def initializePage(self):
@@ -148,6 +149,9 @@ class Page3(QtGui.QWizardPage):
         self.speed_edit.setText(str(data_obj[data_id]["speed"]))
         self.roll_edit.setText(str(data_obj[data_id]["roll"]))
         self.pitch_edit.setText(str(data_obj[data_id]["pitch"]))
+
+    def writeSimFile(self):
+        pass
 
 
 if __name__ == '__main__':
