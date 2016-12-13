@@ -10,6 +10,12 @@ def parseDataFile(data_file):
     return data
 
 
+def kt_of_mps(mps): return mps/0.514444
+
+
+def ft_of_m(m): return m*3.28084
+
+
 class DataWizard(QtGui.QWizard):
     def __init__(self, parent=None):
         super(DataWizard, self).__init__(parent)
@@ -18,9 +24,12 @@ class DataWizard(QtGui.QWizard):
 
         self.addPage(Page1())
         self.addPage(Page2())
-        self.addPage(Page3())
+        self.lastPage = Page3()
+        self.addPage(self.lastPage)
         self.setOption(self.HaveFinishButtonOnEarlyPages)
         self.setOption(self.NoBackButtonOnStartPage)
+
+        self.button(DataWizard.FinishButton).clicked.connect(self.lastPage.writeSimFile)
 
 
 class Page1(QtGui.QWizardPage):
@@ -105,6 +114,8 @@ class Page3(QtGui.QWizardPage):
         self.overlabel = QtGui.QLabel()
         self.overlabel.setText('Here are the parameters that will be loaded into the flight simulator. '
                                '\nClick on "Finish" button to launch simulation')
+
+        self.namelabel = QtGui.QLabel()
         self.latitude_label = QtGui.QLabel()
         self.latitude_label.setText("Latitude (°):")
         self.latitude_edit = QtGui.QLineEdit()
@@ -125,6 +136,7 @@ class Page3(QtGui.QWizardPage):
         self.pitch_edit = QtGui.QLineEdit()
 
         self.vertlayout.addWidget(self.overlabel)
+        self.vertlayout.addWidget(self.namelabel)
         self.vertlayout.addWidget(self.latitude_label)
         self.vertlayout.addWidget(self.latitude_edit)
         self.vertlayout.addWidget(self.longitude_label)
@@ -149,9 +161,33 @@ class Page3(QtGui.QWizardPage):
         self.speed_edit.setText(str(data_obj[data_id]["speed"]))
         self.roll_edit.setText(str(data_obj[data_id]["roll"]))
         self.pitch_edit.setText(str(data_obj[data_id]["pitch"]))
+        self.namelabel.setText(str(data_obj[data_id]["date"]))
+        self.datetxt = self.namelabel.text().split(" ")
 
     def writeSimFile(self):
-        pass
+        day = self.datetxt[2]
+        month = self.datetxt[1]
+        year = self.datetxt[-1]
+        hour = self.datetxt[3]
+        titlehour = hour.split(':')
+        titlehour = str(titlehour[0] + titlehour[1] + titlehour[2])
+        alt = str(ft_of_m(float((self.altitude_edit.text()))))
+        long = self.longitude_edit.text()
+        lat = self.latitude_edit.text()
+        speed = str(kt_of_mps(float(self.speed_edit.text())))
+        roll = self.roll_edit.text()
+        pitch = self.pitch_edit.text()
+        with open(day + "_" + month + "_" + year + "_" + titlehour + '.FDR', 'w') as fic:
+            fic.write("I\n")
+            fic.write("1\n\n")
+            fic.write("COMM, This is a flight data record (FDR) file generated with previously acquired data "
+                      "from smartphones.\n\n")
+            fic.write("ACFT," + "Aircraft/Heavy Metal/Boeing 747-100 NASA.acf,\n")
+            fic.write("TAIL,N8141Q,\n")
+            fic.write("TIME," + hour + ',\n')
+            fic.write("DATE,10/12/2016,\n")
+            fic.write("CALI," + long + ',' + lat + ',' + alt +',\n')
+            fic.write("SPEED," + speed + ',\n')
 
 
 if __name__ == '__main__':
