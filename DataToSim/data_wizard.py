@@ -1,10 +1,8 @@
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 import os
 import sys
-import itertools
 import json
 import pdb
-from pprint import pprint
 
 
 def parseDataFile(data_file):
@@ -27,8 +25,6 @@ class DataWizard(QtGui.QWizard):
 class Page1(QtGui.QWizardPage):
     def __init__(self, parent=None):
         super(Page1, self).__init__(parent)
-
-        self.setObjectName("Page1")
 
         self.pathLineEdit = QtGui.QLineEdit()
         self.pathLabel = QtGui.QLabel()
@@ -60,7 +56,6 @@ class Page1(QtGui.QWizardPage):
 
         self.registerField("path*", self.pathLineEdit)
         self.browseButton.clicked.connect(self.selectFile)
-
 
     def selectFile(self):
         self.datafile_path = QtGui.QFileDialog.getOpenFileName(self, 'Open data file', os.getenv("HOME"),
@@ -153,6 +148,7 @@ class Page3(QtGui.QWizardPage):
         self.speed_edit.setText(str(data_obj[data_id]["speed"]))
         self.roll_edit.setText(str(data_obj[data_id]["roll"]))
         self.pitch_edit.setText(str(data_obj[data_id]["pitch"]))
+
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
