@@ -197,6 +197,7 @@ class Page3(QtGui.QWizardPage):
         yaw = self.yaw_edit.text()
 
         # Linux command to launch Flightgear with the desired options
+        # --prop:/engines/engine[0]/rpm option is used to start the simulation with engine started
         linux_command = "fgfs --prop:/engines/engine[0]/rpm=2500" \
                         " --lat=" + lat + " --lon=" + long + " --altitude=" \
                   + alt + " --vc=" + speed + " --roll=" + roll + " --pitch=" \
