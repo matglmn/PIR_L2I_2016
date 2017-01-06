@@ -42,9 +42,9 @@ class Page1(QtGui.QWizardPage):
         self.introLabel = QtGui.QLabel()
 
         self.pathLabel.setText("File path :")
-        self.introLabel.setText("Welcome on Data to Sim. You can use this application to run "
-                                "acquired data into a simulator !"
-                           "\n\nSelect the data file that you want to load into the "
+        self.introLabel.setText("Welcome on Data to Sim ! Use this application to run "
+                                "flight data into a simulator."
+                           "\n\nSelect the data file you want to load into the "
                                 "flight simulator in the following bar. "
                            "\nData will be used to start a simple simulation with the acquired parameters.")
         self.browseButton.setText("Browse...")
@@ -116,7 +116,8 @@ class Page3(QtGui.QWizardPage):
 
         self.vertlayout = QtGui.QVBoxLayout()
         self.overlabel = QtGui.QLabel()
-        self.overlabel.setText('Here are the parameters that will be loaded into the flight simulator. '
+        self.overlabel.setText('Here are the parameters that will be loaded into the flight simulator.'
+                               '\nYou can change any parameter if necessary.'
                                '\nClick on "Finish" button to launch simulation')
 
         self.namelabel = QtGui.QLabel()
@@ -160,6 +161,9 @@ class Page3(QtGui.QWizardPage):
         self.vertlayout.addWidget(self.yaw_edit)
         self.setLayout(self.vertlayout)
 
+        self.list_month = {'Jan':'01', 'Feb':'02', 'Mar':'03', 'Apr':'04', 'May':'05', 'Jun':'06', 'Jul':'07',
+                           'Aug':'08', 'Sep':'09', 'Oct':'10', 'Nov':'11', 'Dec':'12'}
+
     def initializePage(self):
         """
         Initializes the parameters window of selected marker
@@ -186,8 +190,6 @@ class Page3(QtGui.QWizardPage):
         month = self.datetxt[1]
         year = self.datetxt[-1]
         hour = self.datetxt[3]
-        titlehour = hour.split(':')
-        titlehour = str(titlehour[0] + titlehour[1] + titlehour[2])
         alt = str(ft_of_m(float((self.altitude_edit.text()))))
         long = self.longitude_edit.text()
         lat = self.latitude_edit.text()
@@ -201,7 +203,8 @@ class Page3(QtGui.QWizardPage):
         linux_command = "fgfs --prop:/engines/engine[0]/rpm=2500" \
                         " --lat=" + lat + " --lon=" + long + " --altitude=" \
                   + alt + " --vc=" + speed + " --roll=" + roll + " --pitch=" \
-                  + pitch + " --heading=" + yaw + " --start-date-lat=" + year + ":12:" + day + ":" + hour
+                  + pitch + " --heading=" + yaw + " --start-date-lat=" + year + ":" + self.list_month[month] +\
+                        ":" + day + ":" + hour
         if os.name == 'posix':
              os.system(linux_command)
 
