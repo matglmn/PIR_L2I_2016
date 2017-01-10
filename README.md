@@ -2,7 +2,7 @@
 Architecture for flight data acquisition and replay on simulator
 
 1) FlightData Acquisition <br />
-Java-based Android app for flight parameters acquisition
+Java-based Android app for flight parameters acquisition.
 
 Parameters acquired :
 - location (latitude, longitude, altitude)
