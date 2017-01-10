@@ -1,8 +1,8 @@
 # PIR_L2I_2016
 Architecture for flight data acquisition and replay on simulator
 
-1) FlightData Acquisition
-\nJava-based Android app for flight parameters acquisition
+1) FlightData Acquisition <br />
+Java-based Android app for flight parameters acquisition
 
 Parameters acquired :
 - location (latitude, longitude, altitude)
@@ -13,9 +13,9 @@ Start the acquisition with the start button, set a marker when you want to save 
 Data is saved in .json format on external storage when the acquisition is stopped.
 (Data file name format : MMDDYYYY_HHMMSS_data.txt).
 
-2) Data to Sim
-\nPython-based interface used to import a flight data file (.json) and replay it on Flightgear simulator. 
-\nLINUX ONLY AT THE MOMENT.
+2) Data to Sim <br />
+Python-based interface used to import a flight data file (.json) and replay it on Flightgear simulator. <br />
+LINUX ONLY AT THE MOMENT.
 
 - Import the desired data file with the data browser
 - Select the marker you want to replay
