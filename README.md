@@ -23,7 +23,5 @@ LINUX ONLY AT THE MOMENT.
 
 Flightgear simulator is launched with selected data and the simulation starts.
 
-For any question concerning this project, contact matthieu.gaulmin@alumni.enac.fr
-
 
 
